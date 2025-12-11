@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import '../styles/Register.css';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import logo from '../assets/WASHTRACKLOGO.png';
+import { API_ENDPOINTS } from '../config';
 
 function Register({ onSwitchToLogin }) {
   const [isAdminMode, setIsAdminMode] = useState(false);
@@ -120,7 +121,7 @@ function Register({ onSwitchToLogin }) {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8081/signupuser', {
+      const response = await fetch(API_ENDPOINTS.SIGNUP_USER, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

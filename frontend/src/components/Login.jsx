@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import '../styles/Login.css';
 import logo from '../assets/WASHTRACKLOGO.png';
+import { API_ENDPOINTS } from '../config';
 
 function Login({ onSwitchToRegister, onLoginSuccess }) {
   const [email, setEmail] = useState('');
@@ -44,8 +45,8 @@ function Login({ onSwitchToRegister, onLoginSuccess }) {
 
     try {
       const endpoint = isAdmin
-        ? 'http://localhost:8081/loginadmin'
-        : 'http://localhost:8081/loginuser';
+        ? API_ENDPOINTS.LOGIN_ADMIN
+        : API_ENDPOINTS.LOGIN_USER;
 
       const response = await fetch(endpoint, {
         method: 'POST',

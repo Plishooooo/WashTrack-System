@@ -3,6 +3,7 @@ import '../styles/Services.css';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import deletelogo from '../assets/DELETE.png';
 import editlogo from '../assets/EDIT.png';
+import { API_ENDPOINTS } from '../config';
 
 function Services() {
   const [services, setServices] = useState([]);
@@ -47,7 +48,7 @@ function Services() {
 
   const fetchServices = async () => {
     try {
-      const response = await fetch('http://localhost:8081/services');
+      const response = await fetch(API_ENDPOINTS.GET_SERVICES);
       const result = await response.json();
       if (result.success) {
         setServices(result.data);
@@ -65,7 +66,7 @@ function Services() {
 
   const confirmDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8081/services/${id}`, {
+      const response = await fetch(API_ENDPOINTS.DELETE_SERVICE(id), {
         method: 'DELETE',
       });
       const result = await response.json();
@@ -137,7 +138,7 @@ function Services() {
 
     try {
       const response = await fetch(
-        `http://localhost:8081/services/${editService}`,
+        API_ENDPOINTS.UPDATE_SERVICE(editService),
         {
           method: 'PUT',
           headers: {
@@ -225,7 +226,7 @@ function Services() {
     }
 
     try {
-      const response = await fetch('http://localhost:8081/services', {
+      const response = await fetch(API_ENDPOINTS.CREATE_SERVICE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

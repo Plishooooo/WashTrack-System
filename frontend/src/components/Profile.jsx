@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../styles/Profile.css';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import { API_ENDPOINTS } from '../config';
 
 function Profile({ onRefreshUserData }) {
   const [profileData, setProfileData] = useState({
@@ -46,7 +47,7 @@ function Profile({ onRefreshUserData }) {
 
       // GET DATA FROM tbl_user
       const userResponse = await fetch(
-        `http://localhost:8081/getuser/${userEmail}`
+        API_ENDPOINTS.GET_USER(userEmail)
       );
       const userData = await userResponse.json();
 
@@ -56,7 +57,7 @@ function Profile({ onRefreshUserData }) {
 
         // GET ADDRESS FROM tbl_profiles using the userId
         const profileResponse = await fetch(
-          `http://localhost:8081/getprofile/${userData.user.fld_userID}`
+          API_ENDPOINTS.GET_PROFILE(userData.user.fld_userID)
         );
         const profileData = await profileResponse.json();
 
@@ -179,7 +180,7 @@ function Profile({ onRefreshUserData }) {
 
         // Verify old password first
         const verifyResponse = await fetch(
-          'http://localhost:8081/verifypassword',
+          API_ENDPOINTS.VERIFY_PASSWORD,
           {
             method: 'POST',
             headers: {
@@ -201,7 +202,7 @@ function Profile({ onRefreshUserData }) {
 
         // Update password if old password is correct
         const passwordResponse = await fetch(
-          'http://localhost:8081/updatepassword',
+          API_ENDPOINTS.UPDATE_PASSWORD,
           {
             method: 'PUT',
             headers: {
@@ -223,7 +224,7 @@ function Profile({ onRefreshUserData }) {
       }
 
       // FOR UPDATING tbl_user
-      const userResponse = await fetch('http://localhost:8081/updateuser', {
+      const userResponse = await fetch(API_ENDPOINTS.UPDATE_USER, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -239,7 +240,7 @@ function Profile({ onRefreshUserData }) {
       if (userData.success) {
         // FOR UPDATING tbl_profiles using userId
         const profileResponse = await fetch(
-          'http://localhost:8081/updateprofile',
+          API_ENDPOINTS.UPDATE_PROFILE,
           {
             method: 'PUT',
             headers: {
@@ -267,7 +268,7 @@ function Profile({ onRefreshUserData }) {
           if (onRefreshUserData) {
             // Fetch the updated user data
             const updatedResponse = await fetch(
-              `http://localhost:8081/getuser/${userEmail}`
+              API_ENDPOINTS.GET_USER(userEmail)
             );
             const updatedData = await updatedResponse.json();
 
