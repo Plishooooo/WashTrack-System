@@ -996,4 +996,5 @@ app.post('/reports', (req, res) => {
 
 app.listen(8081, '0.0.0.0', () => {
   console.log('Server running on port 8081');
+  console.log('Route order fixed: /getuser/id/:userId comes before /getuser/:email');
 });
