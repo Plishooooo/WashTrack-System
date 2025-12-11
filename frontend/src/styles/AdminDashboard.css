@@ -1,0 +1,135 @@
+*body {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #c6e0f8;
+}
+
+.admin-header {
+  background-color: #1c4e7d;
+  padding: 20px 30px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.admin-header .logo {
+  margin: 0;
+  font-size: 24px;
+  color: white;
+  font-weight: 600;
+}
+
+.welcome-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+}
+
+.logout-btn {
+  padding: 8px 20px;
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #764ba2;
+}
+
+.admin-nav {
+  background-color: #c6e0f8;
+  padding: 15px 30px;
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  border-bottom: 1px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+.nav-btn {
+  padding: 10px 20px;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: black;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-btn:hover {
+  color: #333;
+}
+
+.nav-btn.active {
+  background-color: transparent;
+  color: #333;
+  border-color: transparent;
+}
+
+.nav-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #333;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .logout-btn {
+    align-self: flex-end;
+  }
+
+  .admin-nav {
+    padding: 10px 15px;
+  }
+
+  .nav-btn {
+    font-size: 12px;
+    padding: 8px 15px;
+  }
+
+  .admin-content {
+    padding: 20px;
+  }
+}
