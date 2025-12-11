@@ -7,10 +7,11 @@ app.use(cors());
 app.use(express.json());
 
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '1234',
-  database: 'washtrack_db',
+  host: process.env.MYSQLHOST || 'switchyard.proxy.rlwy.net',
+  user: process.env.MYSQLUSER || 'root',
+  password: process.env.MYSQLPASSWORD || 'lrnexAtnMKgHawwrQGQZQWyspqRXCnQC',
+  database: process.env.MYSQLDATABASE || 'washtrack_db',
+  port: parseInt(process.env.MYSQLPORT) || 47896,
 });
 
 // CONNECTION
@@ -21,6 +22,16 @@ db.connect((err) => {
   } else {
     console.log('Connected to database');
   }
+});
+
+// ROOT ENDPOINT FOR HEALTH CHECK
+app.get('/', (req, res) => {
+  res.json({ status: 'OK', message: 'WashTrack Backend is running' });
+});
+
+// HEALTH CHECK ENDPOINT
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Server is healthy' });
 });
 
 // FOR SIGNUP FUNCTIONALITY

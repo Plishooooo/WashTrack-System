@@ -3,6 +3,7 @@ import '../styles/Reports.css';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import 'jspdf-autotable';
+import { API_ENDPOINTS } from '../config';
 
 function Reports() {
   // Date range filter state
@@ -92,15 +93,15 @@ function Reports() {
       setLoading(true);
 
       // Fetch all reports with order details
-      const reportsResponse = await fetch('http://localhost:8081/reports');
+      const reportsResponse = await fetch(API_ENDPOINTS.GET_REPORTS);
       const reportsData = await reportsResponse.json();
 
       // Fetch all orders for revenue calculation
-      const ordersResponse = await fetch('http://localhost:8081/orders');
+      const ordersResponse = await fetch(API_ENDPOINTS.GET_ORDERS);
       const ordersData = await ordersResponse.json();
 
       // Fetch all users
-      const usersResponse = await fetch('http://localhost:8081/allusers');
+      const usersResponse = await fetch(API_ENDPOINTS.GET_ALL_USERS);
       const usersData = await usersResponse.json();
 
       if (reportsData.success && ordersData.success && usersData.success) {
