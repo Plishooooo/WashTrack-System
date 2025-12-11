@@ -279,14 +279,14 @@ app.post('/loginuser', (req, res) => {
   });
 });
 
-// FOR GETTING USER DATA AFTER LOGIN
-app.get('/getuser/:email', (req, res) => {
-  const userEmail = req.params.email;
+// FOR GETTING USER BY ID (MORE SPECIFIC ROUTE - MUST BE FIRST)
+app.get('/getuser/id/:userId', (req, res) => {
+  const userId = req.params.userId;
 
   const sql =
-    'SELECT fld_userID, fld_username, fld_email, fld_contact FROM tbl_user WHERE fld_email = ?';
+    'SELECT fld_userID, fld_username, fld_email, fld_contact FROM tbl_user WHERE fld_userID = ?';
 
-  db.query(sql, [userEmail], (err, result) => {
+  db.query(sql, [parseInt(userId)], (err, result) => {
     if (err) {
       return res.json({
         success: false,
@@ -302,14 +302,14 @@ app.get('/getuser/:email', (req, res) => {
   });
 });
 
-// FOR GETTING USER BY ID
-app.get('/getuser/id/:userId', (req, res) => {
-  const userId = req.params.userId;
+// FOR GETTING USER DATA AFTER LOGIN (LESS SPECIFIC ROUTE - COMES AFTER)
+app.get('/getuser/:email', (req, res) => {
+  const userEmail = req.params.email;
 
   const sql =
-    'SELECT fld_userID, fld_username, fld_email, fld_contact FROM tbl_user WHERE fld_userID = ?';
+    'SELECT fld_userID, fld_username, fld_email, fld_contact FROM tbl_user WHERE fld_email = ?';
 
-  db.query(sql, [parseInt(userId)], (err, result) => {
+  db.query(sql, [userEmail], (err, result) => {
     if (err) {
       return res.json({
         success: false,
