@@ -24,11 +24,11 @@ app.use(express.json());
 app.options('*', cors(corsOptions)); // Handle preflight requests
 
 const db = mysql.createConnection({
-  host: process.env.MYSQLHOST || 'switchyard.proxy.rlwy.net',
+  host: process.env.MYSQLHOST || 'mysql.railway.internal',
   user: process.env.MYSQLUSER || 'root',
   password: process.env.MYSQLPASSWORD || 'lrnexAtnMKgHawwrQGQZQWyspqRXCnQC',
   database: process.env.MYSQLDATABASE || 'washtrack_db',
-  port: parseInt(process.env.MYSQLPORT) || 47896,
+  port: parseInt(process.env.MYSQLPORT) || 3306,
 });
 
 // CONNECTION
