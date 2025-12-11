@@ -3,8 +3,24 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 
-app.use(cors());
+// CORS Configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || origin === 'http://localhost:3000' || origin === 'http://localhost:5173' || origin.includes('vercel.app') || origin.includes('railway.app')) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all origins for now
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+app.options('*', cors(corsOptions)); // Handle preflight requests
 
 const db = mysql.createConnection({
   host: process.env.MYSQLHOST || 'mysql.railway.internal',
@@ -22,6 +38,14 @@ db.connect((err) => {
   } else {
     console.log('Connected to database');
   }
+});
+
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  console.log('Origin:', req.get('origin'));
+  console.log('Content-Type:', req.get('content-type'));
+  next();
 });
 
 // ROOT ENDPOINT FOR HEALTH CHECK
