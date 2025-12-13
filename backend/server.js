@@ -22,7 +22,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.options('*', cors(corsOptions)); // Handle preflight requests
 
 const db = mysql.createConnection({
   host: process.env.MYSQLHOST,
