@@ -1,5 +1,7 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
+  ? 'https://washtrack-system-production.up.railway.app'
+  : 'http://localhost:8081');
 
 export const API_ENDPOINTS = {
   // Auth endpoints
