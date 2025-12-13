@@ -1,4 +1,5 @@
 // WashTrack-System Backend - v7c7715b
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
@@ -24,10 +25,10 @@ app.use(express.json());
 app.options('*', cors(corsOptions)); // Handle preflight requests
 
 const db = mysql.createConnection({
-  host: process.env.MYSQLHOST || 'mysql.railway.internal',
-  user: process.env.MYSQLUSER || 'root',
-  password: process.env.MYSQLPASSWORD || 'lrnexAtnMKgHawwrQGQZQWyspqRXCnQC',
-  database: process.env.MYSQLDATABASE || 'washtrack_db',
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
   port: parseInt(process.env.MYSQLPORT) || 3306,
 });
 
