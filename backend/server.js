@@ -50,7 +50,7 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'qcu.washtrack@gmail.com',
-    pass: 'qcutrackwash123',
+    pass: 'umeu ejtq dflp ucze',
   },
 });
 
