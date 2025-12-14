@@ -7,8 +7,13 @@ const sgMail = require('@sendgrid/mail');
 const app = express();
 
 // SendGrid Configuration
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || 'SG.kN4K7lNiSp24-t7fOUvXEA.Xmwm5S9lU5K6_3M8j8Q9L0R1S2T3U4V5W6X7Y8Z9';
-sgMail.setApiKey(SENDGRID_API_KEY);
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+if (!SENDGRID_API_KEY) {
+  console.error('❌ SENDGRID_API_KEY environment variable is not set!');
+} else {
+  sgMail.setApiKey(SENDGRID_API_KEY);
+  console.log('✅ SendGrid configured with API key from environment');
+}
 
 // Email verification storage (in-memory, clears on server restart)
 const verificationCodes = {};
