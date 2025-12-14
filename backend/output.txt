@@ -1,0 +1,4 @@
+Server running on port 8081
+Route order fixed: /getuser/id/:userId comes before /getuser/:email
+Database connection failed: getaddrinfo ENOTFOUND mysql.railway.internal
+Error code: ENOTFOUND

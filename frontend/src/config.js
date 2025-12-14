@@ -8,6 +8,8 @@ export const API_ENDPOINTS = {
   LOGIN_USER: `${API_BASE_URL}/loginuser`,
   LOGIN_ADMIN: `${API_BASE_URL}/loginadmin`,
   SIGNUP_USER: `${API_BASE_URL}/signupuser`,
+  SEND_VERIFICATION_CODE: `${API_BASE_URL}/send-verification-code`,
+  VERIFY_CODE: `${API_BASE_URL}/verify-code`,
   
   // User endpoints
   GET_USER: (email) => `${API_BASE_URL}/getuser/${email}`,
