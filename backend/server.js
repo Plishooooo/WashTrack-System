@@ -114,14 +114,18 @@ app.post('/send-verification-code', async (req, res) => {
       `,
     };
 
-    console.log('Attempting to send email...');
+    console.log('Attempting to send email to:', email);
+    console.log('Email config:', { user: process.env.EMAIL_USER || 'qcu.washtrack@gmail.com', host: 'smtp.gmail.com', port: 587 });
     
     // Send email in background (don't wait for it)
     transporter.sendMail(mailOptions).then(() => {
       console.log('✅ Email sent successfully to:', email);
     }).catch((emailError) => {
-      console.error('❌ Email sending error:', emailError.message);
-      // Still log it but don't block the response
+      console.error('❌ Email sending FAILED');
+      console.error('Error message:', emailError.message);
+      console.error('Error code:', emailError.code);
+      console.error('Error response:', emailError.response);
+      console.error('Full error:', emailError);
     });
     
     // Respond immediately - code is stored and will work
@@ -169,6 +173,49 @@ app.post('/verify-code', (req, res) => {
     success: true, 
     message: 'Email verified successfully' 
   });
+});
+
+// TEST EMAIL ENDPOINT (for debugging)
+app.post('/test-email', async (req, res) => {
+  const { email } = req.body;
+  console.log('🧪 Test email request received for:', email);
+
+  if (!email) {
+    return res.json({ success: false, error: 'Email is required' });
+  }
+
+  try {
+    const testMailOptions = {
+      from: 'qcu.washtrack@gmail.com',
+      to: email,
+      subject: 'WashTrack Test Email',
+      text: 'This is a test email from WashTrack. If you received this, the email system is working correctly!',
+      html: '<p>This is a test email from WashTrack.</p><p>If you received this, the email system is working correctly!</p>'
+    };
+
+    console.log('🧪 Sending test email to:', email);
+    
+    transporter.sendMail(testMailOptions).then(() => {
+      console.log('✅ Test email sent successfully to:', email);
+      res.json({ 
+        success: true, 
+        message: 'Test email sent successfully' 
+      });
+    }).catch((err) => {
+      console.error('❌ Test email FAILED');
+      console.error('Error:', err);
+      res.json({ 
+        success: false, 
+        error: 'Email sending failed: ' + err.message 
+      });
+    });
+  } catch (error) {
+    console.error('❌ Test email error:', error);
+    res.json({ 
+      success: false, 
+      error: 'Error: ' + error.message 
+    });
+  }
 });
 
 // FOR SIGNUP FUNCTIONALITY
