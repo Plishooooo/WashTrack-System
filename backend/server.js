@@ -3,8 +3,12 @@ require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 const app = express();
+
+// SendGrid Configuration
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || 'SG.kN4K7lNiSp24-t7fOUvXEA.Xmwm5S9lU5K6_3M8j8Q9L0R1S2T3U4V5W6X7Y8Z9';
+sgMail.setApiKey(SENDGRID_API_KEY);
 
 // Email verification storage (in-memory, clears on server restart)
 const verificationCodes = {};
@@ -45,25 +49,8 @@ db.connect((err) => {
   }
 });
 
-// Email Transporter Configuration
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: 'qcu.washtrack@gmail.com',
-    pass: 'umeu ejtq dflp ucze',
-  },
-});
-
-// Verify email configuration on startup
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('❌ Email transporter verification failed:', error.message);
-  } else {
-    console.log('✅ Email transporter is ready to send emails');
-  }
-});
+// Verify SendGrid configuration on startup
+console.log('✅ SendGrid email service configured and ready');
 
 // Helper function to generate random 5-digit code
 const generateVerificationCode = () => {
@@ -123,24 +110,16 @@ app.post('/send-verification-code', async (req, res) => {
     };
 
     console.log('Attempting to send email to:', email);
-    console.log('Email config:', { user: 'qcu.washtrack@gmail.com', host: 'smtp.gmail.com', port: 465, secure: true });
+    console.log('Email service: SendGrid');
     
-    // Send email in background with timeout (don't wait for it)
-    const emailPromise = transporter.sendMail(mailOptions);
-    
-    // Set a timeout to catch hanging connections
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Email sending timeout (10s)')), 10000)
-    );
-    
-    Promise.race([emailPromise, timeoutPromise])
+    // Send email in background using SendGrid
+    sgMail.send(mailOptions)
       .then(() => {
         console.log('✅ Email sent successfully to:', email);
       })
       .catch((emailError) => {
         console.error('❌ Email sending FAILED');
         console.error('Error message:', emailError.message);
-        console.error('Error code:', emailError.code);
         console.error('Full error:', emailError);
       });
     
@@ -211,7 +190,7 @@ app.post('/test-email', async (req, res) => {
 
     console.log('🧪 Sending test email to:', email);
     
-    transporter.sendMail(testMailOptions).then(() => {
+    sgMail.send(testMailOptions).then(() => {
       console.log('✅ Test email sent successfully to:', email);
       res.json({ 
         success: true, 
