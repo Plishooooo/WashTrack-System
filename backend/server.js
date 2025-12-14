@@ -84,12 +84,15 @@ app.get('/health', (req, res) => {
 app.post('/send-verification-code', async (req, res) => {
   const { email } = req.body;
 
+  console.log('📧 Verification code request received for:', email);
+
   if (!email) {
     return res.json({ success: false, error: 'Email is required' });
   }
 
   try {
     const verificationCode = generateVerificationCode();
+    console.log('Generated verification code for', email);
     
     // Store the code with email (expires in 10 minutes)
     verificationCodes[email] = {
@@ -111,7 +114,9 @@ app.post('/send-verification-code', async (req, res) => {
       `,
     };
 
+    console.log('Attempting to send email...');
     await transporter.sendMail(mailOptions);
+    console.log('✅ Email sent successfully to:', email);
     
     res.json({ 
       success: true, 
@@ -119,7 +124,8 @@ app.post('/send-verification-code', async (req, res) => {
       email: email 
     });
   } catch (error) {
-    console.error('Email sending error:', error);
+    console.error('❌ Email sending error:', error.message);
+    console.error('Full error:', error);
     res.json({ 
       success: false, 
       error: 'Failed to send verification code: ' + error.message 
