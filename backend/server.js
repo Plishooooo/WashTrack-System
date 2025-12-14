@@ -115,20 +115,26 @@ app.post('/send-verification-code', async (req, res) => {
     };
 
     console.log('Attempting to send email...');
-    await transporter.sendMail(mailOptions);
-    console.log('✅ Email sent successfully to:', email);
     
+    // Send email in background (don't wait for it)
+    transporter.sendMail(mailOptions).then(() => {
+      console.log('✅ Email sent successfully to:', email);
+    }).catch((emailError) => {
+      console.error('❌ Email sending error:', emailError.message);
+      // Still log it but don't block the response
+    });
+    
+    // Respond immediately - code is stored and will work
     res.json({ 
       success: true, 
       message: 'Verification code sent to email',
       email: email 
     });
   } catch (error) {
-    console.error('❌ Email sending error:', error.message);
-    console.error('Full error:', error);
+    console.error('❌ Error storing verification code:', error.message);
     res.json({ 
       success: false, 
-      error: 'Failed to send verification code: ' + error.message 
+      error: 'Failed to process verification: ' + error.message 
     });
   }
 });
