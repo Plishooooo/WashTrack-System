@@ -134,13 +134,19 @@ function Register({ onSwitchToLogin }) {
     setError('');
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch(API_ENDPOINTS.SEND_VERIFICATION_CODE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email: formData.email }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       const result = await response.json();
 
@@ -151,7 +157,12 @@ function Register({ onSwitchToLogin }) {
         setError(result.error || 'Failed to send verification code');
       }
     } catch (error) {
-      setError('Cannot connect to server. Make sure backend is running.');
+      if (error.name === 'AbortError') {
+        setError('Request timeout. Please check your internet connection and try again.');
+      } else {
+        console.error('Verification code error:', error);
+        setError('Failed to connect to server. Make sure backend is running at: ' + API_ENDPOINTS.SEND_VERIFICATION_CODE);
+      }
     } finally {
       setSendingCode(false);
     }
