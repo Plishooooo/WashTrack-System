@@ -19,12 +19,9 @@ function Register({ onSwitchToLogin }) {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  // Check if user is logged in as admin
+  // Always show admin/user toggle on register page
   useEffect(() => {
-    const userType = localStorage.getItem('userType');
-    if (userType === 'admin') {
-      setIsAdmin(true);
-    }
+    setIsAdmin(true);
   }, []);
 
   const handleChange = (e) => {
