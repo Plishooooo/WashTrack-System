@@ -3,6 +3,7 @@ import '../styles/Register.css';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import logo from '../assets/WASHTRACKLOGO.png';
 import { API_ENDPOINTS } from '../config';
+import VerificationCodeModal from './VerificationCodeModal';
 
 function Register({ onSwitchToLogin }) {
   const [isAdminMode, setIsAdminMode] = useState(false);
@@ -18,8 +19,11 @@ function Register({ onSwitchToLogin }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [sendingCode, setSendingCode] = useState(false);
 
-  // Always show admin/user toggle on register page
+  // ADMIN USER TOGGLE
   useEffect(() => {
     setIsAdmin(true);
   }, []);
@@ -115,6 +119,45 @@ function Register({ onSwitchToLogin }) {
       return;
     }
 
+    // If email not verified yet, send verification code
+    if (!emailVerified) {
+      await sendVerificationCode();
+      return;
+    }
+
+    // Email is verified, proceed with registration
+    completeRegistration();
+  };
+
+  const sendVerificationCode = async () => {
+    setSendingCode(true);
+    setError('');
+
+    try {
+      const response = await fetch(API_ENDPOINTS.SEND_VERIFICATION_CODE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        showSuccessToast('Verification code sent to your email!');
+        setShowVerificationModal(true);
+      } else {
+        setError(result.error || 'Failed to send verification code');
+      }
+    } catch (error) {
+      setError('Cannot connect to server. Make sure backend is running.');
+    } finally {
+      setSendingCode(false);
+    }
+  };
+
+  const completeRegistration = async () => {
     setLoading(true);
 
     try {
@@ -145,6 +188,11 @@ function Register({ onSwitchToLogin }) {
           password: '',
           confirmPassword: '',
         });
+        setEmailVerified(false);
+        // Optionally redirect to login after successful registration
+        setTimeout(() => {
+          onSwitchToLogin();
+        }, 1500);
       } else {
         showErrorToast(result.error || 'An error occurred during registration');
       }
@@ -153,6 +201,21 @@ function Register({ onSwitchToLogin }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleVerificationSuccess = () => {
+    setShowVerificationModal(false);
+    setEmailVerified(true);
+    showSuccessToast('Email verified! Completing registration...');
+    // Proceed with registration after a short delay
+    setTimeout(() => {
+      completeRegistration();
+    }, 500);
+  };
+
+  const handleVerificationCancel = () => {
+    setShowVerificationModal(false);
+    setError('Email verification cancelled. Please try again.');
   };
 
   return (
@@ -280,8 +343,8 @@ function Register({ onSwitchToLogin }) {
             />
           </div>
 
-          <button type="submit" className="register-btn" disabled={loading}>
-            {loading ? 'Registering...' : 'Create Account'}
+          <button type="submit" className="register-btn" disabled={loading || sendingCode}>
+            {sendingCode ? 'Sending Code...' : loading ? 'Registering...' : 'Create Account'}
           </button>
         </form>
 
@@ -319,6 +382,14 @@ function Register({ onSwitchToLogin }) {
         )}
         {message && <div className="success-message">{message}</div>}
       </div>
+
+      {/* Verification Code Modal */}
+      <VerificationCodeModal
+        email={formData.email}
+        onVerified={handleVerificationSuccess}
+        onCancel={handleVerificationCancel}
+        isOpen={showVerificationModal}
+      />
     </div>
   );
 }

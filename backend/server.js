@@ -3,7 +3,11 @@ require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const nodemailer = require('nodemailer');
 const app = express();
+
+// Email verification storage (in-memory, clears on server restart)
+const verificationCodes = {};
 
 // CORS Configuration
 const corsOptions = {
@@ -41,6 +45,20 @@ db.connect((err) => {
   }
 });
 
+// Email Transporter Configuration
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'qcu.washtrack@gmail.com',
+    pass: 'qcutrackwash123',
+  },
+});
+
+// Helper function to generate random 5-digit code
+const generateVerificationCode = () => {
+  return Math.floor(10000 + Math.random() * 90000).toString();
+};
+
 // Request logging middleware
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
@@ -57,6 +75,85 @@ app.get('/', (req, res) => {
 // HEALTH CHECK ENDPOINT
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is healthy' });
+});
+
+// SEND VERIFICATION CODE EMAIL
+app.post('/send-verification-code', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.json({ success: false, error: 'Email is required' });
+  }
+
+  try {
+    const verificationCode = generateVerificationCode();
+    
+    // Store the code with email (expires in 10 minutes)
+    verificationCodes[email] = {
+      code: verificationCode,
+      timestamp: Date.now(),
+      expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes
+    };
+
+    const mailOptions = {
+      from: 'qcu.washtrack@gmail.com',
+      to: email,
+      subject: 'WashTrack Email Verification Code',
+      html: `
+        <h2>Email Verification</h2>
+        <p>Your WashTrack verification code is:</p>
+        <h1 style="color: #2196F3; font-size: 36px; letter-spacing: 5px;">${verificationCode}</h1>
+        <p>This code will expire in 10 minutes.</p>
+        <p>If you did not request this code, please ignore this email.</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    
+    res.json({ 
+      success: true, 
+      message: 'Verification code sent to email',
+      email: email 
+    });
+  } catch (error) {
+    console.error('Email sending error:', error);
+    res.json({ 
+      success: false, 
+      error: 'Failed to send verification code: ' + error.message 
+    });
+  }
+});
+
+// VERIFY CODE ENDPOINT
+app.post('/verify-code', (req, res) => {
+  const { email, code } = req.body;
+
+  if (!email || !code) {
+    return res.json({ success: false, error: 'Email and code are required' });
+  }
+
+  const stored = verificationCodes[email];
+
+  if (!stored) {
+    return res.json({ success: false, error: 'No verification code found for this email' });
+  }
+
+  if (Date.now() > stored.expiresAt) {
+    delete verificationCodes[email];
+    return res.json({ success: false, error: 'Verification code has expired' });
+  }
+
+  if (stored.code !== code) {
+    return res.json({ success: false, error: 'Invalid verification code' });
+  }
+
+  // Code is valid, delete it
+  delete verificationCodes[email];
+  
+  res.json({ 
+    success: true, 
+    message: 'Email verified successfully' 
+  });
 });
 
 // FOR SIGNUP FUNCTIONALITY
