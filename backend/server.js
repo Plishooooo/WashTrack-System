@@ -48,13 +48,21 @@ db.connect((err) => {
 // Email Transporter Configuration
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  requireTLS: true,
+  port: 465,
+  secure: true,
   auth: {
     user: 'qcu.washtrack@gmail.com',
     pass: 'umeu ejtq dflp ucze',
   },
+});
+
+// Verify email configuration on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('❌ Email transporter verification failed:', error.message);
+  } else {
+    console.log('✅ Email transporter is ready to send emails');
+  }
 });
 
 // Helper function to generate random 5-digit code
@@ -115,18 +123,26 @@ app.post('/send-verification-code', async (req, res) => {
     };
 
     console.log('Attempting to send email to:', email);
-    console.log('Email config:', { user: process.env.EMAIL_USER || 'qcu.washtrack@gmail.com', host: 'smtp.gmail.com', port: 587 });
+    console.log('Email config:', { user: 'qcu.washtrack@gmail.com', host: 'smtp.gmail.com', port: 465, secure: true });
     
-    // Send email in background (don't wait for it)
-    transporter.sendMail(mailOptions).then(() => {
-      console.log('✅ Email sent successfully to:', email);
-    }).catch((emailError) => {
-      console.error('❌ Email sending FAILED');
-      console.error('Error message:', emailError.message);
-      console.error('Error code:', emailError.code);
-      console.error('Error response:', emailError.response);
-      console.error('Full error:', emailError);
-    });
+    // Send email in background with timeout (don't wait for it)
+    const emailPromise = transporter.sendMail(mailOptions);
+    
+    // Set a timeout to catch hanging connections
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Email sending timeout (10s)')), 10000)
+    );
+    
+    Promise.race([emailPromise, timeoutPromise])
+      .then(() => {
+        console.log('✅ Email sent successfully to:', email);
+      })
+      .catch((emailError) => {
+        console.error('❌ Email sending FAILED');
+        console.error('Error message:', emailError.message);
+        console.error('Error code:', emailError.code);
+        console.error('Full error:', emailError);
+      });
     
     // Respond immediately - code is stored and will work
     res.json({ 
