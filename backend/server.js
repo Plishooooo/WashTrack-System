@@ -47,7 +47,10 @@ db.connect((err) => {
 
 // Email Transporter Configuration
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  requireTLS: true,
   auth: {
     user: 'qcu.washtrack@gmail.com',
     pass: 'umeu ejtq dflp ucze',
