@@ -116,6 +116,8 @@ app.post('/send-verification-code', async (req, res) => {
 
     console.log('Attempting to send email to:', email);
     console.log('Email service: SendGrid');
+    console.log('From address:', mailOptions.from);
+    console.log('API Key set:', !!SENDGRID_API_KEY);
     
     // Send email in background using SendGrid
     sgMail.send(mailOptions)
@@ -125,7 +127,10 @@ app.post('/send-verification-code', async (req, res) => {
       .catch((emailError) => {
         console.error('❌ Email sending FAILED');
         console.error('Error message:', emailError.message);
-        console.error('Full error:', emailError);
+        console.error('Error code:', emailError.code);
+        console.error('Response status:', emailError.response?.status);
+        console.error('Response body:', emailError.response?.body);
+        console.error('Full error:', JSON.stringify(emailError, null, 2));
       });
     
     // Respond immediately - code is stored and will work
