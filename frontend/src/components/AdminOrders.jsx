@@ -562,7 +562,7 @@ function AdminOrders() {
         status: newOrderForm.status,
         amount: amount.toString(),
         adminID: adminID,
-        items: newOrderForm.weight,
+        items: `${newOrderForm.weight} kg`,
       };
       console.log('Sending order data:', orderData);
 
