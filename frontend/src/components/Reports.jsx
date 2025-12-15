@@ -92,12 +92,20 @@ function Reports() {
     try {
       setLoading(true);
 
+      const adminID = localStorage.getItem('adminID');
+      
       // Fetch all reports with order details
-      const reportsResponse = await fetch(API_ENDPOINTS.GET_REPORTS);
+      const reportsUrl = adminID
+        ? `${API_ENDPOINTS.GET_REPORTS}?adminID=${adminID}`
+        : API_ENDPOINTS.GET_REPORTS;
+      const reportsResponse = await fetch(reportsUrl);
       const reportsData = await reportsResponse.json();
 
       // Fetch all orders for revenue calculation
-      const ordersResponse = await fetch(API_ENDPOINTS.GET_ORDERS);
+      const ordersUrl = adminID
+        ? `${API_ENDPOINTS.GET_ORDERS}?adminID=${adminID}`
+        : API_ENDPOINTS.GET_ORDERS;
+      const ordersResponse = await fetch(ordersUrl);
       const ordersData = await ordersResponse.json();
 
       // Fetch all users

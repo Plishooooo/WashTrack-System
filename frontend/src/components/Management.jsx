@@ -31,7 +31,11 @@ function Management() {
 
   const fetchStaff = async () => {
     try {
-      const response = await fetch(API_ENDPOINTS.GET_STAFF);
+      const adminID = localStorage.getItem('adminID');
+      const url = adminID
+        ? `${API_ENDPOINTS.GET_STAFF}?adminID=${adminID}`
+        : API_ENDPOINTS.GET_STAFF;
+      const response = await fetch(url);
       const result = await response.json();
       if (result.success) {
         setAccounts(result.data);
@@ -43,7 +47,11 @@ function Management() {
 
   const fetchServices = async () => {
     try {
-      const response = await fetch(API_ENDPOINTS.GET_SERVICES);
+      const adminID = localStorage.getItem('adminID');
+      const url = adminID
+        ? `${API_ENDPOINTS.GET_SERVICES}?adminID=${adminID}`
+        : API_ENDPOINTS.GET_SERVICES;
+      const response = await fetch(url);
       const result = await response.json();
       if (result.success) {
         setServices(result.data);

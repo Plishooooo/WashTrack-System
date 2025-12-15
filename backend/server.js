@@ -630,9 +630,17 @@ app.put('/updatepassword', (req, res) => {
 // FOR GETTING ALL SERVICES
 app.get('/services', (req, res) => {
   console.log('GET /services endpoint called');
-  const sql = 'SELECT * FROM tbl_services';
+  const adminID = req.query.adminID;
 
-  db.query(sql, (err, result) => {
+  let sql = 'SELECT * FROM tbl_services';
+  let params = [];
+
+  if (adminID) {
+    sql += ' WHERE fld_adminID = ?';
+    params.push(adminID);
+  }
+
+  db.query(sql, params, (err, result) => {
     if (err) {
       console.error('Services fetch error:', err);
       res.json({
@@ -648,14 +656,14 @@ app.get('/services', (req, res) => {
 
 // FOR CREATING A NEW SERVICE
 app.post('/services', (req, res) => {
-  const { name, description, status, price } = req.body;
+  const { name, description, status, price, adminID } = req.body;
 
-  console.log('Creating service with:', { name, description, status, price });
+  console.log('Creating service with:', { name, description, status, price, adminID });
 
   const sql =
-    'INSERT INTO tbl_services (fld_serviceName, fld_description, fld_serviceStatus, fld_servicePrice) VALUES (?, ?, ?, ?)';
+    'INSERT INTO tbl_services (fld_serviceName, fld_description, fld_serviceStatus, fld_servicePrice, fld_adminID) VALUES (?, ?, ?, ?, ?)';
 
-  db.query(sql, [name, description, status, price], (err, result) => {
+  db.query(sql, [name, description, status, price, adminID || null], (err, result) => {
     if (err) {
       console.error('Database error:', err);
       res.json({
@@ -736,7 +744,7 @@ app.delete('/services/:id', (req, res) => {
 
 // FOR GETTING ALL ORDERS or ORDERS BY USER ID
 app.get('/orders', (req, res) => {
-  const { userID } = req.query;
+  const { userID, adminID } = req.query;
 
   let sql = `
     SELECT 
@@ -755,27 +763,41 @@ app.get('/orders', (req, res) => {
     LEFT JOIN tbl_services s ON o.fld_serviceID = s.fld_serviceID
   `;
 
+  let whereConditions = [];
+  let params = [];
+
   // If userID is provided, filter by that userID
   if (userID) {
-    sql += ` WHERE o.fld_userID = ? `;
-    console.log('Fetching orders for userID:', userID);
-    db.query(
-      sql + 'ORDER BY o.fld_orderDate DESC',
-      [parseInt(userID)],
-      (err, result) => {
-        if (err) {
-          res.json({
-            success: false,
-            error: 'Failed to fetch orders: ' + err.message,
-          });
-        } else {
-          res.json({ success: true, data: result });
-        }
+    whereConditions.push('o.fld_userID = ?');
+    params.push(parseInt(userID));
+  }
+
+  // If adminID is provided, filter by that adminID
+  if (adminID) {
+    whereConditions.push('o.fld_adminID = ?');
+    params.push(parseInt(adminID));
+  }
+
+  if (whereConditions.length > 0) {
+    sql += ' WHERE ' + whereConditions.join(' AND ');
+  }
+
+  sql += ' ORDER BY o.fld_orderDate DESC';
+
+  if (params.length > 0) {
+    console.log('Fetching orders with filters:', { userID, adminID });
+    db.query(sql, params, (err, result) => {
+      if (err) {
+        res.json({
+          success: false,
+          error: 'Failed to fetch orders: ' + err.message,
+        });
+      } else {
+        res.json({ success: true, data: result });
       }
-    );
+    });
   } else {
-    // Fetching all of orders for admin
-    sql += ` ORDER BY o.fld_orderDate DESC`;
+    // Fetching all orders
     console.log('Fetching all orders');
     db.query(sql, (err, result) => {
       if (err) {
@@ -1110,16 +1132,26 @@ app.delete('/staff/:id', (req, res) => {
 
 // FOR GETTING ALL REPORTS
 app.get('/reports', (req, res) => {
-  const sql = `
+  const adminID = req.query.adminID;
+
+  let sql = `
     SELECT r.fld_reportID, r.fld_adminID, r.fld_orderID, r.fld_dateGenerated,
            o.fld_amount, o.fld_orderStatus, u.fld_username
     FROM tbl_reports r
     LEFT JOIN tbl_orders o ON r.fld_orderID = o.fld_orderID
     LEFT JOIN tbl_user u ON o.fld_userID = u.fld_userID
-    ORDER BY r.fld_dateGenerated DESC
   `;
 
-  db.query(sql, (err, result) => {
+  let params = [];
+
+  if (adminID) {
+    sql += ' WHERE r.fld_adminID = ?';
+    params.push(adminID);
+  }
+
+  sql += ' ORDER BY r.fld_dateGenerated DESC';
+
+  db.query(sql, params, (err, result) => {
     if (err) {
       console.error('Error fetching reports:', err);
       return res.json({
