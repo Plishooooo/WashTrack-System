@@ -48,7 +48,11 @@ function Services() {
 
   const fetchServices = async () => {
     try {
-      const response = await fetch(API_ENDPOINTS.GET_SERVICES);
+      const adminID = localStorage.getItem('adminID');
+      const url = adminID
+        ? `${API_ENDPOINTS.GET_SERVICES}?adminID=${adminID}`
+        : API_ENDPOINTS.GET_SERVICES;
+      const response = await fetch(url);
       const result = await response.json();
       if (result.success) {
         setServices(result.data);
@@ -226,12 +230,16 @@ function Services() {
     }
 
     try {
+      const adminID = localStorage.getItem('adminID');
       const response = await fetch(API_ENDPOINTS.CREATE_SERVICE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          adminID: adminID || null,
+        }),
       });
       const result = await response.json();
       if (result.success) {

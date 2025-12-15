@@ -64,7 +64,11 @@ function AdminOrders() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch(API_ENDPOINTS.GET_ORDERS);
+      const adminID = localStorage.getItem('adminID');
+      const url = adminID 
+        ? `${API_ENDPOINTS.GET_ORDERS}?adminID=${adminID}`
+        : API_ENDPOINTS.GET_ORDERS;
+      const response = await fetch(url);
       const result = await response.json();
       if (result.success) {
         setOrders(result.data);
@@ -85,7 +89,11 @@ function AdminOrders() {
   const fetchServices = async () => {
     try {
       console.log('Fetching services...');
-      const response = await fetch(API_ENDPOINTS.GET_SERVICES);
+      const adminID = localStorage.getItem('adminID');
+      const url = adminID
+        ? `${API_ENDPOINTS.GET_SERVICES}?adminID=${adminID}`
+        : API_ENDPOINTS.GET_SERVICES;
+      const response = await fetch(url);
       const result = await response.json();
       console.log('Services response:', result);
       if (result.success) {
