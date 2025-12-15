@@ -71,7 +71,6 @@ function VerificationCodeModal({ email, onVerified, onCancel, isOpen }) {
       const result = await response.json();
 
       if (result.success) {
-        showSuccessToast('Email verified successfully!');
         onVerified();
       } else {
         setError(result.error || 'Invalid verification code');

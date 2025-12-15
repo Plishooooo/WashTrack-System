@@ -1279,18 +1279,22 @@ function AdminOrders() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="add-weight">Weight (kg)</label>
-                <input
-                  type="number"
-                  id="add-weight"
-                  name="weight"
-                  value={newOrderForm.weight}
-                  onChange={handleAddFormChange}
-                  placeholder="Enter weight in kilograms"
-                  step="0.1"
-                  min="0"
-                  required
-                />
+                <label htmlFor="add-weight">Weight</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="number"
+                    id="add-weight"
+                    name="weight"
+                    value={newOrderForm.weight}
+                    onChange={handleAddFormChange}
+                    placeholder="Enter weight in kilograms"
+                    step="0.1"
+                    min="0"
+                    required
+                    style={{ flex: 1 }}
+                  />
+                  <span style={{ fontSize: '14px', fontWeight: '500', color: '#333', minWidth: '30px' }}>kg</span>
+                </div>
               </div>
 
               <div className="form-group">
