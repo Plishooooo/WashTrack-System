@@ -95,16 +95,18 @@ function Reports() {
       const adminID = localStorage.getItem('adminID');
       
       // Fetch all reports with order details
-      const reportsUrl = adminID
-        ? `${API_ENDPOINTS.GET_REPORTS}?adminID=${adminID}`
-        : API_ENDPOINTS.GET_REPORTS;
+      let reportsUrl = API_ENDPOINTS.GET_REPORTS;
+      if (adminID) {
+        reportsUrl = `${API_ENDPOINTS.GET_REPORTS}?adminID=${adminID}`;
+      }
       const reportsResponse = await fetch(reportsUrl);
       const reportsData = await reportsResponse.json();
 
       // Fetch all orders for revenue calculation
-      const ordersUrl = adminID
-        ? `${API_ENDPOINTS.GET_ORDERS}?adminID=${adminID}`
-        : API_ENDPOINTS.GET_ORDERS;
+      let ordersUrl = API_ENDPOINTS.GET_ORDERS;
+      if (adminID) {
+        ordersUrl = `${API_ENDPOINTS.GET_ORDERS}?adminID=${adminID}`;
+      }
       const ordersResponse = await fetch(ordersUrl);
       const ordersData = await ordersResponse.json();
 
@@ -131,7 +133,9 @@ function Reports() {
         // Apply date range filter if specified
         if (activeRange.startDate && activeRange.endDate) {
           const startDate = new Date(activeRange.startDate);
+          startDate.setHours(0, 0, 0, 0);
           const endDate = new Date(activeRange.endDate);
+          endDate.setHours(23, 59, 59, 999);
           filteredOrders = filteredOrders.filter((order) => {
             const orderDate = new Date(order.fld_orderDate);
             return orderDate >= startDate && orderDate <= endDate;
@@ -206,7 +210,9 @@ function Reports() {
 
         if (checkRange.startDate && checkRange.endDate) {
           const startDate = new Date(checkRange.startDate);
+          startDate.setHours(0, 0, 0, 0);
           const endDate = new Date(checkRange.endDate);
+          endDate.setHours(23, 59, 59, 999);
 
           // Count users registered in the date range
           activeCustomers = users.filter((user) => {
