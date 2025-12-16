@@ -756,7 +756,10 @@ function Reports() {
             All Time
           </button>
           <button
-            onClick={() => setTimePeriod('today')}
+            onClick={() => {
+              setTimePeriod('today');
+              setDateRange({ startDate: '', endDate: '' });
+            }}
             style={{
               padding: '8px 16px',
               backgroundColor: timePeriod === 'today' ? '#667eea' : '#f0f0f0',
@@ -772,7 +775,10 @@ function Reports() {
             Today
           </button>
           <button
-            onClick={() => setTimePeriod('last7days')}
+            onClick={() => {
+              setTimePeriod('last7days');
+              setDateRange({ startDate: '', endDate: '' });
+            }}
             style={{
               padding: '8px 16px',
               backgroundColor:
@@ -789,7 +795,10 @@ function Reports() {
             Last 7 Days
           </button>
           <button
-            onClick={() => setTimePeriod('lastMonth')}
+            onClick={() => {
+              setTimePeriod('lastMonth');
+              setDateRange({ startDate: '', endDate: '' });
+            }}
             style={{
               padding: '8px 16px',
               backgroundColor:
@@ -806,7 +815,10 @@ function Reports() {
             Last Month
           </button>
           <button
-            onClick={() => setTimePeriod('last3Months')}
+            onClick={() => {
+              setTimePeriod('last3Months');
+              setDateRange({ startDate: '', endDate: '' });
+            }}
             style={{
               padding: '8px 16px',
               backgroundColor:
@@ -823,7 +835,10 @@ function Reports() {
             Last 3 Months
           </button>
           <button
-            onClick={() => setTimePeriod('lastYear')}
+            onClick={() => {
+              setTimePeriod('lastYear');
+              setDateRange({ startDate: '', endDate: '' });
+            }}
             style={{
               padding: '8px 16px',
               backgroundColor:
