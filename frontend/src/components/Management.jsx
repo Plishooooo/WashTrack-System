@@ -370,7 +370,7 @@ function Management() {
         <div className="modal-overlay" onClick={handleCloseAddForm}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Add New Admin</h3>
+              <h3>Add New Staff</h3>
               <button className="close-btn" onClick={handleCloseAddForm}>
                 ✕
               </button>
